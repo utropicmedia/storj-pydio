@@ -109,7 +109,7 @@ func newPydioClient(urlPydio string, user string, password string) error {
 	conf.User = user
 	conf.Password = password
 
-	// Insure values are legal
+	// Ensure values are legal
 	conf.Url = strings.Trim(conf.Url, " ")
 	if len(conf.Url) == 0 {
 		return fmt.Errorf("Field cannot be empty!")
@@ -125,7 +125,6 @@ func newPydioClient(urlPydio string, user string, password string) error {
 		return fmt.Errorf("URL %s is not valid: %s", conf.Url, err.Error())
 	}
 
-	// Test a simple PING with this config before saving!
 	rest.DefaultConfig = conf
 
 	_, _, err = rest.GetApiClient()

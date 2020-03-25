@@ -1,3 +1,9 @@
 { 
-    "backupfile": "backupfilepath"
+   "pydioUrl": "IPAddressPortToPydioServer",
+    "username": "pydioUserName",
+    "password": "pydioPassword",
+	"endpoint": "s3.amazonaws.com",
+    "accessKeyID": "amazonawsS3AccessKey",
+    "secretAccessKey":"amazonawsS3SecretAccessKey",
+	"bucketname":"amazonawsS3BucketName"
 }

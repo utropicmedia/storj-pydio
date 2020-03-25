@@ -21,7 +21,7 @@ import (
 // DEBUG allows more detailed working to be exposed through the terminal.
 var DEBUG = false
 
-// ConfigStorj depicts keys to search for within the stroj_config.json file.
+// ConfigStorj depicts keys to search for within the storj_config.json file.
 type ConfigStorj struct {
 	APIKey               string `json:"apiKey"`
 	Satellite            string `json:"satelliteURL"`
@@ -29,7 +29,6 @@ type ConfigStorj struct {
 	UploadPath           string `json:"uploadPath"`
 	EncryptionPassphrase string `json:"encryptionPassphrase"`
 	SerializedScope      string `json:"serializedScope"`
-	Key                  string `json:"key"`
 	DisallowReads        string `json:"disallowReads"`
 	DisallowWrites       string `json:"disallowWrites"`
 	DisallowDeletes      string `json:"disallowDeletes"`
@@ -75,8 +74,8 @@ func ConnectStorjReadUploadData(fullFileName string, keyValue string, restrict s
 	fmt.Println("\nCreating New Uplink...")
 
 	var cfg uplink.Config
-	// Configure the partner id
-	cfg.Volatile.PartnerID = "a1ba07a4-e095-4a43-914c-1d56c9ff5afd"
+	// Configure the user agent
+	cfg.Volatile.UserAgent = "Pydio"
 
 	ctx := context.Background()
 
@@ -258,28 +257,21 @@ func ConnectUpload(ctx context.Context, bucket *uplink.Bucket, data io.Reader, f
 }
 
 // Debug function downloads the data from storj bucket after upload to verify data is uploaded successfully.
-func Debug(ctx context.Context, bucket *uplink.Bucket, filename string) {
+func Debug(ctx context.Context, bucket *uplink.Bucket, uploadPath string, fileName []string) {
 	if DEBUG {
-
-		list, err := bucket.ListObjects(ctx, &uplink.ListOptions{
-			Direction: 2,
-			Cursor:    "",
-			Prefix:    filename,
-			Recursive: false,
-		})
-
-		if err != nil {
-			log.Fatal(err)
+		checkSlash := uploadPath[len(uploadPath)-1:]
+		if checkSlash != "/" {
+			uploadPath = uploadPath + "/"
 		}
-		_ = os.MkdirAll("debug", 0755) //Make "debug" directory on system
 
-		for _, object := range list.Items {
+		_ = os.MkdirAll("debug/", 0755) //Make "debug" directory on system
+		for i := 0; i < len(fileName); i++ {
 			// Test uploaded data by downloading it.
 			// Initiate a download of the same object again.
-			fmt.Printf("\n\nDownloading Object %s from bucket : Initiated...\n", object.Path)
-			strm, err := bucket.Download(ctx, filename+"/"+object.Path)
+			fmt.Printf("\n\nDownloading Object %s from bucket : Initiated...\n", fileName[i])
+			strm, err := bucket.Download(ctx, uploadPath+fileName[i])
 			if err != nil {
-				fmt.Printf("Could not open object at %q: %v", filename+"/"+object.Path, err)
+				fmt.Printf("Could not open object at %q: %v", uploadPath+fileName[i], err)
 			}
 			defer strm.Close()
 
@@ -288,8 +280,9 @@ func Debug(ctx context.Context, bucket *uplink.Bucket, filename string) {
 			if err != nil {
 				fmt.Printf("Could not read object: %v", err)
 			}
-
-			var fileNameDownload = filepath.Join("debug", object.Path)
+			filePath := filepath.Dir(fileName[i])
+			_ = os.MkdirAll("debug/"+uploadPath+filePath, 0755) //Make directory on system
+			var fileNameDownload = filepath.Join("debug", uploadPath+fileName[i])
 			f, err := os.OpenFile(fileNameDownload, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
 			_, err = f.Write(receivedContents) //Append the bytes to the file created
 			if err != nil {

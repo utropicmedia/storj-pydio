@@ -39,7 +39,7 @@ $ go get -u ./...
     * apiKey :- API key created in Storj satellite gui
     * satelliteURL :- Storj Satellite URL
     * encryptionPassphrase :- Storj Encryption Passphrase.
-    * bucketName :- Split file into given size before uploading.
+    * bucketName :- Storj Bucket name.
     * uploadPath :- Path on Storj Bucket to store data (optional) or "/"
     * serializedScope:- Serialized Scope Key shared while uploading data used to access bucket without API key
     * disallowReads:- Set true to create serialized scope key with restricted read access
@@ -60,7 +60,7 @@ $ go get -u ./...
     }
 ```
 
-* Store both these files in a `config` folder.  Filename command-line arguments are optional.  defualt locations are used.
+* Store both these files in a `config` folder.  Filename command-line arguments are optional.  default locations are used.
 
 ## Run the command-line tool
 
